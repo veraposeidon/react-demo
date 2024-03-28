@@ -1,95 +1,66 @@
-import Image from "next/image";
+"use client";
+
 import styles from "./page.module.css";
+import Dealer from "@/app/component/Dealer";
+import PlayerHand from "@/app/component/PlayHand";
+import Controls from "@/app/component/Controls";
+import Pot from "@/app/component/Pot";
+import {useState} from "react";
 
 export default function Home() {
+    const [dealerCards, setDealerCards] = useState([]);
+    const [playerCards, setPlayerCards] = useState([]);
+    const [potAmount, setPotAmount] = useState(0);
+    const [gameStarted, setGameStarted] = useState(false);
+
+
+    const handleCheck = () => { /* ... */ };
+    const handleFold = () => { /* ... */ };
+    const handleRaise = () => { /* ... */ };
+
+    // fetch cards when start game
+    // https://deckofcardsapi.com/api/deck/new/draw/?count=6
+    const fetchCards = async () => {
+        try {
+            const response = await fetch('https://deckofcardsapi.com/api/deck/new/draw/?count=10'); // 替换成你的API端点
+            const data = await response.json();
+            const cards = data.cards;
+            const dealer = cards.slice(0, 5);
+            setDealerCards(dealer);
+            const player = cards.slice(5, 7);
+            setPlayerCards(player);
+            // 这里假设API返回的数据结构是 { dealer: [], player: [] }
+            setGameStarted(true);
+        } catch (error) {
+            console.error('Error fetching card data:', error);
+        }
+    };
+
+    const handleStartGame = () => {
+        fetchCards();
+    };
+
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      <main className={styles.main}>
+          <div id="gameboard">
+              {/*庄家牌*/}
+              <Dealer cards={dealerCards}/>
+              {/*玩家手牌区域*/}
+              <PlayerHand cards={playerCards} show={true} index={0} money={100}/>
+              <PlayerHand cards={playerCards} show={true} index={1} money={100}/>
+              <PlayerHand cards={playerCards} show={true} index={2} money={100}/>
+              <PlayerHand cards={playerCards} show={true} index={3} money={100}/>
+              <PlayerHand cards={playerCards} show={true} index={4} money={100}/>
+              {/*操作栏*/}
+              <Controls onCheck={handleCheck} onFold={handleFold} onRaise={handleRaise}/>
+              {/*奖池*/}
+              <Pot amount={potAmount}/>
+              {/* More game elements here */}
+              <button id="btn-start" onClick={handleStartGame}>
+                  Start Game
+              </button>
+          </div>
+      </main>
   );
 }
